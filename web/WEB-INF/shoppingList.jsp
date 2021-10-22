@@ -33,5 +33,7 @@
             <input type="hidden" name="action" value="delete">
             <input type="submit" value="Delete">
         </form>
+        
+        <p>${message}</p>
     </body>
 </html>

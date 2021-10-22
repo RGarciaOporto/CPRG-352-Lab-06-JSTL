@@ -20,14 +20,11 @@ public class ShoppingListServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         String action = request.getParameter("action");
-        
-        //validate that action is initiated properly. 
-        if(action != null){
-            if (action.equals("logout")){
+        if (action != null && action.equals("logout")){
             session.invalidate();
-            }
+            request.setAttribute("message", "You have been successfully logged out.");
         }
-            getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request,response); 
+        getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request,response); 
     }
 
     @Override
@@ -50,18 +47,37 @@ public class ShoppingListServlet extends HttpServlet {
         if(action != null){    
         switch(action){
                 case "register":
+                    //only register users when they add a username
+                    String username = request.getParameter("username");
+                    if(username.length() > 0){
                     session.setAttribute("username", request.getParameter("username"));
                     request.setAttribute("username", session.getAttribute("username"));
                     getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
+                    }
+                    else{
+                    request.setAttribute("message", "Please enter a username.");
+                    getServletContext().getRequestDispatcher("/WEB-INF/register.jsp").forward(request,response);
+                    }
                     break;
                 case "add":
+                    //only add an item if one has been written in the jsp. 
+                    String newItem = request.getParameter("item");
+                    if(newItem.length() > 0){
                     shoppingCart.add(request.getParameter("item"));
                     session.setAttribute("session_shoppingList", shoppingCart);
                     request.setAttribute("cart", shoppingCart);
                     getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
+                    } 
+                    else{
+                    request.setAttribute("message", "Please enter an item before adding");
+                    request.setAttribute("cart", shoppingCart);
+                    getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
+                    }
                     break;
                 case "delete":
                     String removeItem = request.getParameter("item");
+                    //only go through deletion process if an item has been selected.
+                    if(removeItem != null){
                     for(int i = 0; i < shoppingCart.size(); i++){
                     if(shoppingCart.get(i).equals(removeItem))
                         shoppingCart.remove(i);
@@ -69,14 +85,16 @@ public class ShoppingListServlet extends HttpServlet {
                     session.setAttribute("session_shoppingList", shoppingCart);
                     request.setAttribute("cart", shoppingCart);
                     getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
+                    }
+                    else{
+                    request.setAttribute("message", "Please select an item to delete.");
+                    request.setAttribute("cart", shoppingCart);
+                    getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
+                    }
                     break;
                 case "logout":
                     doGet(request,response);
                     break;
-                default:
-                    //code
-                    break;
-                
             }
         }
     }
