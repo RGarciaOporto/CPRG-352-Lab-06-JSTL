@@ -57,11 +57,18 @@ public class ShoppingListServlet extends HttpServlet {
                 case "add":
                     shoppingCart.add(request.getParameter("item"));
                     session.setAttribute("session_shoppingList", shoppingCart);
-                    request.setAttribute("cart",shoppingCart);
+                    request.setAttribute("cart", shoppingCart);
                     getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
                     break;
                 case "delete":
-                    //code
+                    String removeItem = request.getParameter("item");
+                    for(int i = 0; i < shoppingCart.size(); i++){
+                    if(shoppingCart.get(i).equals(removeItem))
+                        shoppingCart.remove(i);
+                    }
+                    session.setAttribute("session_shoppingList", shoppingCart);
+                    request.setAttribute("cart", shoppingCart);
+                    getServletContext().getRequestDispatcher("/WEB-INF/shoppingList.jsp").forward(request,response);
                     break;
                 case "logout":
                     doGet(request,response);
